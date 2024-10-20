@@ -34,10 +34,14 @@ jobs:
       - name: メール送信
         uses: dawidd6/action-send-mail@v3
         with:
-          connection_url: smtp://{{ secrets.SMTP_USERNAME }}:{{ secrets.SMTP_PASSWORD }}@{{ secrets.SMTP_SERVER }}:{{ secrets.SMTP_PORT }}
+          # SMTPサーバーの設定（GitHub Secretsに設定してください）
+          server_address: ${{ secrets.SMTP_SERVER }}
+          server_port: ${{ secrets.SMTP_PORT }}
+          username: ${{ secrets.SMTP_USERNAME }}
+          password: ${{ secrets.SMTP_PASSWORD }}
           subject: 'ビルドと実行結果'
           to: ${{ secrets.EMAIL_TO }}
           from: ${{ secrets.EMAIL_FROM }}
-          content_type: text/plain
+          content_type: 'text/plain'
           body: |
-              ${{ steps.run_program.outputs.output }}
+            ${{ steps.run_program.outputs.output }}
