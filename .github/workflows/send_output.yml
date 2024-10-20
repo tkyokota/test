@@ -22,14 +22,16 @@ jobs:
       - name: プログラムの実行と出力の取得
         id: run_program
         run: |
-          RESULT=$(./hello_world)
-          echo "result=$RESULT" >> $GITHUB_ENV
+          set -e
+          ./hello_world > output.txt 2> error.log || true
+          echo "::set-output name=program_output::$(cat output.txt)"
+          cat error.log
 
       - name: メールの送信
         uses: dawidd6/action-send-mail@v3
         with:
           server_address: smtp.mail.yahoo.co.jp  # SMTPサーバーのアドレス
-          server_port: 587                       # SMTPサーバーのポート
+          server_port: 465                       # SMTPサーバーのポート
           username: ${{ secrets.EMAIL_USERNAME }}  # シークレットに設定したユーザー名
           password: ${{ secrets.EMAIL_PASSWORD }}  # シークレットに設定したパスワード
           subject: 'プログラムの実行結果'
