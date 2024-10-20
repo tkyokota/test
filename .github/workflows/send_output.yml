@@ -16,6 +16,9 @@ jobs:
       - name: Cコードのコンパイル
         run: gcc -o test test.c
 
+      - name: 実行権限の付与
+        run: chmod +x test
+
       - name: プログラムの実行と出力の取得
         id: run_program
         run: |
