@@ -1,41 +1,38 @@
-name: Send Program Output via Email
+name: Build and Send Email on Push
 
 on:
   push:
-    branches:
-      - master  # 対象のブランチ名
 
 jobs:
   build-and-email:
     runs-on: ubuntu-latest
 
     steps:
-      - name: コードのチェックアウト
+      - name: リポジトリをチェックアウト
         uses: actions/checkout@v3
 
-      - name: Cコードのコンパイル
+      - name: プログラムをビルド
         run: gcc -o hello_world hello_world.c
 
-      - name: 実行権限の付与
-        run: chmod +x hello_world
-
-      - name: プログラムの実行と出力の取得
+      - name: プログラムを実行して出力を保存
         id: run_program
         run: |
-          set -e
-          ./hello_world > output.txt 2> error.log || true
-          echo "::set-output name=program_output::$(cat output.txt)"
-          cat error.log
+          ./hello_world > output.txt
+          echo "output<<EOF" >> $GITHUB_OUTPUT
+          cat output.txt >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
 
-      - name: メールの送信
+      - name: メール送信
         uses: dawidd6/action-send-mail@v3
         with:
-          server_address: smtp.mail.yahoo.co.jp  # SMTPサーバーのアドレス
-          server_port: 465                       # SMTPサーバーのポート
-          username: ${{ secrets.EMAIL_USERNAME }}  # シークレットに設定したユーザー名
-          password: ${{ secrets.EMAIL_PASSWORD }}  # シークレットに設定したパスワード
-          subject: 'プログラムの実行結果'
-          body: ${{ steps.run_program.outputs.program_output }}
-          to: recipient@example.com          # 受信者のメールアドレス
-          from: sender@example.com           # 送信者のメールアドレス
-          secure: true                       # SSL/TLSの使用有無
+          # SMTPサーバーの設定（GitHub Secretsに設定してください）
+          server_address: ${{ secrets.SMTP_SERVER }}
+          server_port: ${{ secrets.SMTP_PORT }}
+          username: ${{ secrets.SMTP_USERNAME }}
+          password: ${{ secrets.SMTP_PASSWORD }}
+          subject: 'ビルドと実行結果'
+          to: ${{ secrets.EMAIL_TO }}
+          from: ${{ secrets.EMAIL_FROM }}
+          content_type: 'text/plain'
+          body: |
+            ${{ steps.run_program.outputs.output }}
