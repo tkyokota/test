@@ -14,12 +14,18 @@ jobs:
       - name: プログラムをビルド
         run: gcc -o hello_world hello_world.c
 
+      - name: 実行権限を付与
+        run: chmod +x hello_world
+      
       - name: プログラムを実行して出力を保存
         id: run_program
         run: |
-          ./hello_world > output.txt
+          ./hello_world > output.txt 2> error.log
           echo "output<<EOF" >> $GITHUB_OUTPUT
           cat output.txt >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+          echo "error<<EOF" >> $GITHUB_OUTPUT
+          cat error.log >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
 
       - name: メール送信
