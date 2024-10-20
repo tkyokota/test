@@ -20,13 +20,16 @@ jobs:
       - name: プログラムを実行して出力を保存
         id: run_program
         run: |
-          ./hello_world > output.txt 2> error.log
+          ./hello_world > output.txt 2> error.log || true
           echo "output<<EOF" >> $GITHUB_OUTPUT
           cat output.txt >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
-          echo "error<<EOF" >> $GITHUB_OUTPUT
-          cat error.log >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
+      
+      - name: エラーログの表示
+        if: failure() || always()
+        run: |
+          echo "---- Error Log ----"
+          cat error.log
 
       - name: メール送信
         uses: dawidd6/action-send-mail@v3
