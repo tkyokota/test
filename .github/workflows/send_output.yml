@@ -22,10 +22,8 @@ jobs:
       - name: プログラムの実行と出力の取得
         id: run_program
         run: |
-          set -e
-          ./hello_world > output.txt 2> error.log || true
-          echo "::set-output name=program_output::$(cat output.txt)"
-          cat error.log
+          RESULT=$(./hello_world)
+          echo "result=$RESULT" >> $GITHUB_ENV
 
       - name: メールの送信
         uses: dawidd6/action-send-mail@v3
