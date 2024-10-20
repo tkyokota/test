@@ -22,9 +22,10 @@ jobs:
       - name: プログラムの実行と出力の取得
         id: run_program
         run: |
-          output=$(./hello_world)
-          echo "$output" > output.txt
-          echo "::set-output name=program_output::$output"
+          set -e
+          ./hello_world > output.txt 2> error.log || true
+          echo "::set-output name=program_output::$(cat output.txt)"
+          cat error.log
 
       - name: メールの送信
         uses: dawidd6/action-send-mail@v3
